@@ -17,16 +17,19 @@ const config = {
   geography: {
     // Set to "true" for each geographic level you want analysis, else set to "false"
     level1: {
-      exist: false,
-      name: 'Country'//Name of your level, put it in the singular
+      exist: true,
+      manual_centroid: false,
+      name: 'Country'
     },
     level2: {
       exist: true,
-      name: 'Region'//Name of your level, put it in the singular
+      manual_centroid: true,
+      name: 'Region'
     },
     level3: {
       exist: true,
-      name: 'District'//Name of your level, put it in the singular
+      manual_centroid: false,
+      name: 'District'
     }
   },
   disease: [

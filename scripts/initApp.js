@@ -14,8 +14,11 @@ async function initApp(){
 
   // CREATE GEOGRAPHIC LAYERS
   if (config.geography.level1.exist) {
-    const data = await getLevel1()
-    level1Layer = L.geoJson(data, {
+    const perims = await getLevel1()
+    if (config.geography.level1.manual_centroid) {
+      level1Centroid = await getLevel1Centroids()
+    }
+    level1Layer = L.geoJson(perims, {
         style: myStyle,
         onEachFeature: MapInteraction
     });
@@ -30,6 +33,9 @@ async function initApp(){
   }
   if (config.geography.level2.exist) {
     const data = await getLevel2()
+    if (config.geography.level2.manual_centroid) {
+      level2Centroid = await getLevel2Centroids()
+    }
     level2Layer = L.geoJson(data, {
         style: myStyle,
         onEachFeature: MapInteraction
@@ -45,6 +51,9 @@ async function initApp(){
   }
   if (config.geography.level3.exist) {
     const data = await getLevel3()
+    if (config.geography.level3.manual_centroid) {
+      level3Centroid = await getLevel3Centroids()
+    }
     level3Layer = L.geoJson(data, {
         style: myStyle,
         onEachFeature: MapInteraction
@@ -60,6 +69,9 @@ async function initApp(){
   }
   // if (config.geography.level4.exist) {
   //   const data = await getLevel4()
+  // if (config.geography.level4.manual_centroid) {
+  //   level4Centroid = await getLevel4Centroids()
+  // }
   //   level4Layer = L.geoJson(data, {
   //       style: myStyle,
   //       onEachFeature: MapInteraction
@@ -109,29 +121,29 @@ async function initApp(){
   $('#app-subtitle').html(config.name)
   let areaString = ''
   if (config.geography.level1.exist && config.initialisation.geography == 'level1') {
-    areaString += '<option selected value="level1">'+config.geography.level1.name+'s</option>'
+    areaString += '<option selected value="level1">'+config.geography.level1.name+'</option>'
     alasqlConfig.epidata_request += ', level1_name STRING, level1_pcode STRING'
     alasqlConfig.epidata_insert += ', level1_name, level1_pcode'
   } else if (config.geography.level1.exist) {
-    areaString += '<option value="level1">'+config.geography.level1.name+'s</option>'
+    areaString += '<option value="level1">'+config.geography.level1.name+'</option>'
     alasqlConfig.epidata_request += ', level1_name STRING, level1_pcode STRING'
     alasqlConfig.epidata_insert += ', level1_name, level1_pcode'
   }
   if (config.geography.level2.exist && config.initialisation.geography == 'level2') {
-    areaString += '<option selected value="level2">'+config.geography.level2.name+'s</option>'
+    areaString += '<option selected value="level2">'+config.geography.level2.name+'</option>'
     alasqlConfig.epidata_request += ', level2_name STRING, level2_pcode STRING'
     alasqlConfig.epidata_insert += ', level2_name, level2_pcode'
   } else if (config.geography.level2.exist) {
-    areaString += '<option value="level2">'+config.geography.level2.name+'s</option>'
+    areaString += '<option value="level2">'+config.geography.level2.name+'</option>'
     alasqlConfig.epidata_request += ', level2_name STRING, level2_pcode STRING'
     alasqlConfig.epidata_insert += ', level2_name, level2_pcode'
   }
   if (config.geography.level3.exist && config.initialisation.geography == 'level3') {
-    areaString += '<option selected value="level3">'+config.geography.level3.name+'s</option>'
+    areaString += '<option selected value="level3">'+config.geography.level3.name+'</option>'
     alasqlConfig.epidata_request += ', level3_name STRING, level3_pcode STRING'
     alasqlConfig.epidata_insert += ', level3_name, level3_pcode'
   }else if (config.geography.level3.exist) {
-    areaString += '<option value="level3">'+config.geography.level3.name+'s</option>'
+    areaString += '<option value="level3">'+config.geography.level3.name+'</option>'
     alasqlConfig.epidata_request += ', level3_name STRING, level3_pcode STRING'
     alasqlConfig.epidata_insert += ', level3_name, level3_pcode'
   }
@@ -450,4 +462,21 @@ async function getLevel3(){
 async function getLevel4(){
     const data = await $.getJSON("data/level4.geojson")
     return data
+}
+
+async function getLevel1Centroids(){
+  const data = await $.getJSON("data/level1_centroids.geojson")
+  return data
+}
+async function getLevel2Centroids(){
+  const data = await $.getJSON("data/level2_centroids.geojson")
+  return data
+}
+async function getLevel3Centroids(){
+  const data = await $.getJSON("data/level3_centroids.geojson")
+  return data
+}
+async function getLevel4Centroids(){
+  const data = await $.getJSON("data/level4_centroids.geojson")
+  return data
 }

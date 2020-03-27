@@ -76,10 +76,15 @@ const customLayer4 = L.geoJson(null, {
 });
 
 const boundarieslayers = L.layerGroup()
+const centroidLayers = L.layerGroup()
 let level4Layer
+let level4Centroid
 let level3Layer
+let level3Centroid
 let level2Layer
+let level2Centroid
 let level1Layer
+let level1Centroid
 let labels
 
 

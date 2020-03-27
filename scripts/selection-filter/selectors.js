@@ -197,7 +197,7 @@ function setAreaList(areamode){
     }
     // BUILD THE PICKER
     let query = '<select class="selectpicker form-control bg-white" title="Secteur" data-live-search="true" multiple id="sectorlist">'
-    query += '<option selected value="*">All '+config.geography.level3.name+'s</option>'
+    query += '<option selected value="*">All</option>'
     if (config.geography.level2.exist) {
       // GROUP DISTRICTS BY REGIONS WITH region_pcode
       $.each(regions, function(i,v){
@@ -232,7 +232,7 @@ function setAreaList(areamode){
     }
     // BUILD THE PICKER
     let query = '<select class="selectpicker form-control" title="Secteur" data-live-search="true" multiple id="sectorlist">'
-    query += '<option selected value="*">All '+config.geography.level2.name+'s</option>'
+    query += '<option selected value="*">All</option>'
     if (config.geography.level1.exist) {
       // GROUP REGIONS BY COUNTRIES WITH country_pcode
       $.each(countries, function(i,v){
@@ -260,7 +260,7 @@ function setAreaList(areamode){
       const countries = epibase.exec('SELECT DISTINCT level1_name, level1_pcode FROM epidata ORDER BY level1_name')
       // BUILD PICKER
       let query = '<select class="selectpicker form-control" title="Secteur" data-live-search="true" multiple id="sectorlist">'
-      query += '<option selected value="*">All '+config.geography.level1.name+'s</option>'
+      query += '<option selected value="*">All</option>'
       $.each(countries, function(i,v){
         query += '<option value="'+v['level1_pcode']+'">'+capitalize(v['level1_name'])+'</option>'
       })

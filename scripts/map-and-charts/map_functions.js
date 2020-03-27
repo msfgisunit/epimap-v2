@@ -82,12 +82,10 @@ class Mapper {
     return content
   }
   //Add a proportionnal circle to a layer
-  static displayCircles(layer, pcode, result, maxValue){
+  static async displayCircles(layer, centroid, pcode, result, maxValue){
     if (layer.feature.properties.pcode == pcode && result > 0) {
       layer.feature.properties.selected = true
       layer.feature.properties.result = result
-      // Turf is used to calculate the centroid of a layer
-      var centroid = turf.centerOfMass(layer.feature);
       var lon = centroid.geometry.coordinates[0];
       var lat = centroid.geometry.coordinates[1];
       let circle
@@ -190,12 +188,28 @@ class Mapper {
     }
     propCircles = L.layerGroup()
     const grouplayer = await eval(analyser.geo_mode+'Layer')
-		Mapper.setLabels(grouplayer)
+    const centroids = await eval(analyser.geo_mode+'Centroid')
+    if (config.geography[analyser.geo_mode].manual_centroid) {
+      Mapper.setLabels(centroids)
+    } else {
+      Mapper.setLabels(grouplayer)
+    }
     grouplayer.eachLayer(function(layer){
       // Reset layer style
       Mapper.resetStyle(layer)
       $.each(dataset, function(i, v){
-        Mapper.displayCircles(layer, v['pcode'], v['result'], maxValue)
+        if (config.geography[analyser.geo_mode].manual_centroid) {
+          let centroid
+          for (let c of centroids.features){
+            if (layer.feature.properties.pcode == c.properties.pcode) {
+              centroid = c
+            }
+          }
+          Mapper.displayCircles(layer, centroid, v['pcode'], v['result'], maxValue)
+        } else {
+          let centroid = turfReduce(turf.polygon(layer.toGeoJSON().geometry.coordinates[0]))
+          Mapper.displayCircles(layer, centroid, v['pcode'], v['result'], maxValue)
+        }
       })
       propCircles.addTo(mymap)
     })
@@ -212,7 +226,12 @@ class Mapper {
       mymap.removeLayer(propCircles)
     }
     const grouplayer = await eval(analyser.geo_mode+'Layer')
-		Mapper.setLabels(grouplayer)
+    const centroids = await eval(analyser.geo_mode+'Centroid')
+    if (config.geography[analyser.geo_mode].manual_centroid) {
+      Mapper.setLabels(centroids)
+    } else {
+      Mapper.setLabels(grouplayer)
+    }
     grouplayer.eachLayer(function(layer){
       Mapper.resetStyle(layer)
       if (analyser.indicator == 'attack') {
@@ -241,17 +260,30 @@ class Mapper {
       mymap.removeLayer(labels)
     }
 		labels = L.layerGroup.collision({margin:5});
-		group.eachLayer(l => {
-			const centroid = turf.centerOfMass(l.feature);
-				labels.addLayer(L.marker([centroid.geometry.coordinates[1], centroid.geometry.coordinates[0]], {
-		      opacity: 1.0,
-		      icon: L.divIcon({
-							html:`<span class='village-label'>${capitalize(l.feature.properties.name)}</span>`
-						}),
-		        interactive: true
-		    })
-			)
-		})
+    if (config.geography[analyser.geo_mode].manual_centroid) {
+      for (let f of group.features) {
+        labels.addLayer(L.marker([f.geometry.coordinates[1], f.geometry.coordinates[0]], {
+            opacity: 1.0,
+            icon: L.divIcon({
+                html:`<span class='village-label'>${capitalize(f.properties.name)}</span>`
+              }),
+              interactive: true
+          })
+        )
+      }
+    } else {
+      group.eachLayer(l => {
+  			const centroid = turf.centerOfMass(l.feature);
+  				labels.addLayer(L.marker([centroid.geometry.coordinates[1], centroid.geometry.coordinates[0]], {
+  		      opacity: 1.0,
+  		      icon: L.divIcon({
+  							html:`<span class='village-label'>${capitalize(l.feature.properties.name)}</span>`
+  						}),
+  		        interactive: true
+  		    })
+  			)
+  		})
+    }
     if ($('#labelsChekbox').is(':checked')) {
       labels.addTo(mymap)
     }
